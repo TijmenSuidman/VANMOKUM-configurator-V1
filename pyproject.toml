@@ -1,0 +1,15 @@
+[project]
+name = "lamp-configurator-backend"
+version = "0.1.0"
+description = "FastAPI backend to generate cached GLB lamp cluster models"
+requires-python = ">=3.10"
+dependencies = [
+  "fastapi>=0.110",
+  "uvicorn[standard]>=0.27",
+  "pydantic>=2.5",
+  "rhino3dm>=8.0",
+  "Pillow>=10.0",
+]
+
+[tool.uvicorn]
+factory = false
