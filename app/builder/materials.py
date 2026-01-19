@@ -70,7 +70,7 @@ MATERIAL_PRESETS = {
     "shade_blonde": {
         "name": "ShadeBlonde",
         "pbrMetallicRoughness": {
-            "baseColorFactor": [0.74, 0.66, 0.55, 1.0],
+            "baseColorFactor": [0.48, 0.40, 0.26, 1.0],
             "metallicFactor": 0.0,
             "roughnessFactor": 0.95,
         },
