@@ -1,0 +1,1221 @@
+<style>
+  :root {
+    --bg-grad: linear-gradient(
+      180deg,
+      #e2e2e2 0%,
+      #d8d8d8 18%,
+      #ededed 52%,
+      #d2d2d2 78%,
+      #bdbdbd 100%
+    );
+
+    --panel: #ffffff;
+    --line: #e6e6e6;
+    --text: #111;
+    --muted: #6a6a6a;
+  }
+
+  * { box-sizing: border-box; }
+
+  .cfg-shell {
+    width: 100%;
+    padding: 28px 28px;
+    background: transparent;
+  }
+
+  .cfg {
+    width: 100%;
+    display: grid;
+    grid-template-columns: minmax(420px, 1fr) minmax(320px, 520px);
+    gap: 48px;
+    font-family: Helvetica, Arial, sans-serif;
+    color: var(--text);
+    align-items: stretch;
+  }
+
+  @media (max-width: 900px) {
+    .cfg { grid-template-columns: 1fr; gap: 28px; }
+  }
+
+  .viewer-wrap {
+    position: relative;
+    background: var(--bg-grad);
+    height: clamp(640px, 86vh, 1100px);
+    border: 1px solid var(--line);
+    width: 100%;
+  }
+
+  model-viewer { width: 100%; height: 100%; background: transparent; }
+
+  .loading {
+    position: absolute;
+    inset: 0;
+    background: rgba(240,240,240,0.72);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  .loading.active { opacity: 1; }
+
+  .panel {
+    background: var(--panel);
+    padding: 34px;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    width: 100%;
+    height: clamp(640px, 86vh, 1100px);
+    overflow: auto;
+    overscroll-behavior: contain;
+  }
+
+  .section { margin-bottom: 22px; }
+
+  .section-title {
+    font-size: 11px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+    color: var(--text);
+  }
+
+  .row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  input[type="number"] {
+    width: 100%;
+    padding: 10px 10px;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    background: #fff;
+    outline: none;
+  }
+  input[type="number"]:focus { border-color: #cfcfcf; }
+
+  .hint-row {
+    display: flex;
+    gap: 12px;
+    margin-top: -6px;
+    color: var(--muted);
+    font-size: 12px;
+  }
+  .hint-row > div { flex: 1; }
+
+  .swatches {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .swatch {
+    width: 34px;
+    height: 34px;
+    border-radius: 999px;
+    border: 1px solid #d7d7d7;
+    background: #fff;
+    cursor: pointer;
+    position: relative;
+    padding: 0;
+    outline: none;
+    flex: 0 0 auto;
+  }
+  .swatch:focus-visible { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+
+  .swatch.is-active::after {
+    content: "";
+    position: absolute;
+    inset: -5px;
+    border-radius: 999px;
+    border: 1px solid #bdbdbd;
+  }
+
+  .swatch[data-color="natural"] { background: #6F5730; }
+  .swatch[data-color="blonde"]  { background: #E8C88F; }
+  .swatch[data-color="white"]   { background: #fafafa; }
+  .swatch[data-color="black"]   { background: #1a1a1a; border-color: #1a1a1a; }
+  .swatch[data-color="cwhite"]  { background: #fafafa; }
+
+  .pills {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .pill {
+    border: 1px solid var(--line);
+    background: #fff;
+    border-radius: 999px;
+    padding: 10px 14px;
+    font-size: 13px;
+    cursor: pointer;
+    outline: none;
+    min-width: 44px;
+    text-align: center;
+    color: var(--text);
+    line-height: 1;
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  .pill.is-active { border-color: #bdbdbd; }
+  .pill:focus-visible { box-shadow: 0 0 0 3px rgba(0,0,0,0.08); }
+  .pill.small { padding: 9px 12px; font-size: 12px; min-width: 40px; }
+
+  /* Seed buttons: smaller and visually distinct */
+  .pill.mini {
+    padding: 7px 10px;
+    font-size: 11px;
+    min-width: 0;
+    border-color: #d0d0d0;
+    color: #333;
+    background: #f7f7f7;
+  }
+  .pill.mini:focus-visible { box-shadow: 0 0 0 3px rgba(0,0,0,0.06); }
+
+  .layout-row {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .seed-inline {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .divider {
+    height: 1px;
+    background: var(--line);
+    margin: 18px 0;
+  }
+
+  .is-hidden { display: none !important; }
+
+  .two-col {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .select {
+    width: 100%;
+    padding: 10px 12px;
+    font-size: 13px;
+    border: 1px solid var(--line);
+    background: #fff;
+    outline: none;
+    border-radius: 10px;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image:
+      linear-gradient(45deg, transparent 50%, #777 50%),
+      linear-gradient(135deg, #777 50%, transparent 50%),
+      linear-gradient(to right, transparent, transparent);
+    background-position:
+      calc(100% - 18px) 50%,
+      calc(100% - 12px) 50%,
+      0 0;
+    background-size:
+      6px 6px,
+      6px 6px,
+      100% 100%;
+    background-repeat: no-repeat;
+  }
+  .select:focus { border-color: #cfcfcf; }
+</style>
+
+<script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+
+<div class="cfg-shell">
+  <div class="cfg">
+    <div class="viewer-wrap">
+      <model-viewer
+        id="viewer"
+        camera-controls
+        camera-orbit="90deg 115deg 9.5m"
+        camera-target="0m -0.8m 0m"
+        min-camera-orbit="auto 10deg 2.0m"
+        max-camera-orbit="auto 170deg 20m"
+        field-of-view="30deg"
+        environment-image="neutral"
+        exposure="1.1"
+        shadow-intensity="0"
+        shadow-softness="0"
+        interaction-prompt="none">
+      </model-viewer>
+
+      <div class="loading" id="loading">Updating configuration</div>
+    </div>
+
+    <div class="panel">
+      <div class="section">
+        <div class="section-title">Collection</div>
+        <select id="collectionSelect" class="select" aria-label="Collection"></select>
+      </div>
+
+      <div class="section">
+        <div class="two-col">
+          <div>
+            <div class="section-title">Number of pendants</div>
+            <div class="pills" data-radio="count">
+              <button class="pill small" type="button" data-action="setCount" data-value="3">3</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="4">4</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="5">5</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="6">6</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="7">7</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="8">8</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="9">9</button>
+              <button class="pill small" type="button" data-action="setCount" data-value="10">10</button>
+            </div>
+          </div>
+
+          <div>
+            <div class="section-title">Layout</div>
+            <div class="layout-row">
+              <div class="pills" data-radio="layout">
+                <button class="pill" type="button" data-action="setLayout" data-value="ring">Spiral</button>
+                <button class="pill" type="button" data-action="setLayout" data-value="random_ring">Random</button>
+              </div>
+
+              <div id="seedInline" class="seed-inline is-hidden" aria-label="Random controls">
+                <button class="pill mini" type="button" data-action="randomizeSeed">Randomize</button>
+                <button class="pill mini" type="button" data-action="resetSeed">Reset</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Suspension (cm)</div>
+        <div class="row">
+          <div style="flex:1; min-width: 180px;">
+            <input id="firstDrop" type="number" value="50" step="10" min="0">
+          </div>
+          <div style="flex:1; min-width: 180px;">
+            <input id="totalDrop" type="number" value="200" step="10" min="0" max="500">
+          </div>
+        </div>
+        <div class="hint-row">
+          <div>First distance to canopy (cm)</div>
+          <div>Total length (cm), max 500</div>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section">
+        <div class="section-title">Canopy colour</div>
+        <div class="swatches" data-radio="canopy">
+          <button class="swatch" type="button" data-action="setCanopy" data-value="0" data-color="black" aria-label="Canopy black"></button>
+          <button class="swatch" type="button" data-action="setCanopy" data-value="1" data-color="cwhite" aria-label="Canopy white"></button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Canopy size</div>
+        <div class="pills" id="canopySizeGroup" data-radio="canopySize">
+          <button class="pill" type="button" data-action="setCanopySize" data-value="0" data-canopysize="s">S</button>
+          <button class="pill" type="button" data-action="setCanopySize" data-value="1" data-canopysize="m">M</button>
+          <button class="pill" type="button" data-action="setCanopySize" data-value="2">L</button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Cables</div>
+        <div class="swatches" data-radio="cable">
+          <button class="swatch" type="button" data-action="setCable" data-value="0" data-color="black" aria-label="Cable black"></button>
+          <button class="swatch" type="button" data-action="setCable" data-value="1" data-color="cwhite" aria-label="Cable white"></button>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="section-title">Set colour for all pendants</div>
+        <div class="swatches" data-radio="allShade">
+          <button class="swatch" type="button" data-action="setAllShade" data-value="0" data-color="natural" aria-label="All shades natural"></button>
+          <button class="swatch" type="button" data-action="setAllShade" data-value="1" data-color="blonde" aria-label="All shades blonde"></button>
+          <button class="swatch" type="button" data-action="setAllShade" data-value="2" data-color="white" aria-label="All shades white"></button>
+        </div>
+      </div>
+
+      <div class="divider"></div>
+
+      <div class="section" style="margin-bottom:0;">
+        <div class="section-title">Pendants</div>
+
+        <div class="section" style="margin-top:12px;">
+          <div class="section-title">Select pendant</div>
+          <div class="pills" id="pendantSelector" data-radio="activePendant"></div>
+        </div>
+
+        <div id="activePendantEditor"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* =========================
+     SETTINGS (single source of truth)
+  ========================= */
+
+  const SETTINGS = {
+    apiBase: "https://inodorously-unfriable-niki.ngrok-free.dev",
+    urlParam: "cfg",
+    totalDropMaxCm: 500,
+    extraLenPerPendantCm: 50,
+
+    rules: {
+      layout: { randomMinCount: 4 },
+      canopySize: {
+        sAllowedMaxCount: 4,  // S allowed when count <= 4
+        mAllowedMaxCount: 7   // M allowed when count <= 7
+      }
+    },
+
+    debounce: {
+      modelMs: 250,
+      suspensionMs: 650,
+      urlMs: 200
+    },
+
+    camera: {
+      defaultThetaDeg: 10,
+      defaultPhiDeg: 85,
+      targetYOffsetFactor: 0.05,
+      radiusFactor: 2.6,
+      radiusMinM: 2.0,
+      radiusMaxM: 20.0,
+      snapDelayMs: 120,
+      wheelReleaseMs: 180
+    }
+  };
+
+  const COLLECTIONS = [
+    { id: "organic", label: "Organic shapes", models: [
+      { id: 0, label: "denny" },
+      { id: 1, label: "alki" },
+      { id: 2, label: "allyn" },
+      { id: 3, label: "madison" }
+    ]},
+    { id: "moon", label: "Moon", models: [
+      { id: 5, label: "moon10" },
+      { id: 6, label: "moon14" },
+      { id: 7, label: "moon18" },
+      { id: 8, label: "moon24" }
+    ]},
+    { id: "nest", label: "Nest", models: [
+      { id: 10, label: "nest24" },
+      { id: 11, label: "nest32" }
+    ]},
+    { id: "hive", label: "Hive", models: [
+      { id: 12, label: "hive9" },
+      { id: 13, label: "hive12" },
+      { id: 14, label: "hive15" }
+    ]},
+    { id: "drop", label: "Drop", models: [
+      { id: 15, label: "drop18" },
+      { id: 16, label: "drop26" }
+    ]},
+    { id: "disc", label: "Disc", models: [
+      { id: 17, label: "disc16" },
+      { id: 18, label: "disc20" },
+      { id: 19, label: "disc24" }
+    ]},
+    { id: "bell", label: "Bell", models: [
+      { id: 21, label: "bell10" },
+      { id: 22, label: "bell16" }
+    ]},
+    { id: "ausi", label: "Ausi", models: [
+      { id: 23, label: "ausi8" },
+      { id: 24, label: "ausi12" },
+      { id: 25, label: "ausi14" }
+    ]}
+  ];
+
+  const DEFAULT_MODEL_ORDER = [1, 2, 0];
+
+  /* =========================
+     UTIL
+  ========================= */
+
+  function clamp(n, lo, hi) {
+    const x = Number(n);
+    if (!isFinite(x)) return lo;
+    return Math.min(hi, Math.max(lo, x));
+  }
+
+  function cmToSteps10(cm) {
+    const n = Number(cm);
+    if (!isFinite(n)) return 0;
+    return Math.max(0, Math.round(n / 10));
+  }
+
+  function steps10ToCm(steps) {
+    const n = Number(steps);
+    if (!isFinite(n)) return 0;
+    return Math.max(0, n * 10);
+  }
+
+  function getCollectionById(id) {
+    return COLLECTIONS.find(c => c.id === id) || COLLECTIONS[0];
+  }
+
+  function modelIsInCollection(modelId, col) {
+    return !!(col && col.models || []).find(m => Number(m.id) === Number(modelId));
+  }
+
+  function debounce(fn, ms) {
+    let t = null;
+    return function (...args) {
+      clearTimeout(t);
+      t = setTimeout(() => fn.apply(null, args), ms);
+    };
+  }
+
+  /* =========================
+     SERIALIZATION (code + URL)
+  ========================= */
+
+  function layoutValueToId(v) {
+    if (v === "ring") return 0;
+    if (v === "ring_center") return 1;
+    if (v === "random_ring") return 2;
+    return 0;
+  }
+
+  function layoutIdToValue(id) {
+    const n = Number(id);
+    if (n === 0) return "ring";
+    if (n === 1) return "ring_center";
+    if (n === 2) return "random_ring";
+    return "ring";
+  }
+
+  function encodeStateToCode(state, dom) {
+    const firstCm = +dom.firstDrop.value || 0;
+    const totalCm = clamp(+dom.totalDrop.value || 0, 0, SETTINGS.totalDropMaxCm);
+
+    const canopySeg = `C${state.canopySize}${state.canopyAppearance}`;
+
+    const layoutId = layoutValueToId(state.layout);
+    const firstSteps = cmToSteps10(firstCm);
+    const totalSteps = cmToSteps10(totalCm);
+    const layoutSeg = `L${layoutId}${String(firstSteps).padStart(2, "0")}${String(totalSteps).padStart(3, "0")}`;
+
+    const cableSeg = `B${state.cable}`;
+
+    const shade = clamp(state.allShade, 0, 2);
+    const pendantItems = state.pendants.map(p => `${p.model},${shade}`).join("-");
+    const pendantSeg = `P${state.count}-${pendantItems}`;
+
+    const seed = Number.isFinite(+state.randomSeed) ? Math.max(0, Math.floor(+state.randomSeed)) : 0;
+    const globalSeg = `G${seed}`;
+
+    return `${canopySeg}.${layoutSeg}.${cableSeg}.${pendantSeg}.${globalSeg}`;
+  }
+
+  function decodeCode(code) {
+    if (!code || typeof code !== "string") return null;
+
+    const out = {
+      canopySize: 0,
+      canopyAppearance: 0,
+      layoutId: 0,
+      firstCm: 50,
+      totalCm: 200,
+      cable: 0,
+      count: 3,
+      randomSeed: 0,
+      allShade: 0,
+      pendants: []
+    };
+
+    const segs = code.split(".").filter(Boolean);
+    for (const seg of segs) {
+      const prefix = seg[0];
+      const body = seg.slice(1);
+
+      if (prefix === "C") {
+        if (body.length < 2) continue;
+        out.canopySize = Number(body[0]) || 0;
+        out.canopyAppearance = Number(body.slice(1)) || 0;
+      }
+
+      if (prefix === "L") {
+        if (body.length < 1 + 2 + 3) continue;
+        out.layoutId = Number(body[0]) || 0;
+        const firstSteps = Number(body.slice(1, 3)) || 0;
+        const totalSteps = Number(body.slice(3)) || 0;
+        out.firstCm = steps10ToCm(firstSteps);
+        out.totalCm = steps10ToCm(totalSteps);
+      }
+
+      if (prefix === "B") out.cable = Number(body) || 0;
+
+      if (prefix === "P") {
+        let count, tokens;
+        try {
+          const parts = body.split("-", 2);
+          if (parts.length < 2) return null;
+
+          count = parseInt(parts[0], 10);
+          const itemsStr = body.slice(parts[0].length + 1);
+          tokens = itemsStr ? itemsStr.split("-") : [];
+        } catch (e) {
+          return null;
+        }
+
+        if (!Number.isFinite(count) || count !== tokens.length) return null;
+
+        out.count = count;
+
+        out.pendants = tokens.map(tok => {
+          const parts = tok.split(",", 2);
+          const modelId = parseInt(parts[0], 10);
+          const shadeId = parseInt(parts[1], 10);
+          return {
+            model: Number.isFinite(modelId) ? modelId : 0,
+            shade: Number.isFinite(shadeId) ? shadeId : 0
+          };
+        });
+
+        const shade0 = out.pendants.length ? out.pendants[0].shade : 0;
+        const allSame = out.pendants.every(p => Number(p.shade) === Number(shade0));
+        out.allShade = allSame ? clamp(shade0, 0, 2) : 0;
+      }
+
+      if (prefix === "G") {
+        const seed = parseInt(body, 10);
+        out.randomSeed = Number.isFinite(seed) ? seed : 0;
+      }
+    }
+
+    if (!out.pendants.length) return null;
+    return out;
+  }
+
+  function getUrlCode() {
+    try {
+      const u = new URL(window.location.href);
+      return u.searchParams.get(SETTINGS.urlParam) || "";
+    } catch (e) { return ""; }
+  }
+
+  function setUrlCode(code) {
+    try {
+      const u = new URL(window.location.href);
+      if (code) u.searchParams.set(SETTINGS.urlParam, code);
+      else u.searchParams.delete(SETTINGS.urlParam);
+      window.history.replaceState({}, "", u.toString());
+    } catch (e) {}
+  }
+
+  /* =========================
+     CAMERA
+  ========================= */
+
+  function cameraHelpers(viewer) {
+    const cfg = SETTINGS.camera;
+
+    function formatOrbit(thetaDeg, phiDeg, radiusM) {
+      return `${thetaDeg.toFixed(3)}deg ${phiDeg.toFixed(3)}deg ${radiusM.toFixed(4)}m`;
+    }
+
+    function formatTarget(x, y, z) {
+      return `${x.toFixed(4)}m ${y.toFixed(4)}m ${z.toFixed(4)}m`;
+    }
+
+    function getModelBounds() {
+      try {
+        if (typeof viewer.getBoundingBox === "function") {
+          const b = viewer.getBoundingBox();
+          if (b && b.min && b.max) {
+            const size = { x: b.max.x - b.min.x, y: b.max.y - b.min.y, z: b.max.z - b.min.z };
+            const center = { x: (b.min.x + b.max.x) / 2, y: (b.min.y + b.max.y) / 2, z: (b.min.z + b.max.z) / 2 };
+            return { size, center };
+          }
+        }
+      } catch (e) {}
+
+      try {
+        if (typeof viewer.getDimensions === "function") {
+          const d = viewer.getDimensions();
+          if (d && isFinite(d.x) && isFinite(d.y) && isFinite(d.z)) {
+            let c = { x: 0, y: 0, z: 0 };
+            if (typeof viewer.getBoundingBoxCenter === "function") {
+              const cc = viewer.getBoundingBoxCenter();
+              if (cc && isFinite(cc.x) && isFinite(cc.y) && isFinite(cc.z)) c = cc;
+            }
+            return { size: { x: d.x, y: d.y, z: d.z }, center: c };
+          }
+        }
+      } catch (e) {}
+
+      return null;
+    }
+
+    function computeAutoDefaultFromBounds() {
+      const b = getModelBounds();
+      if (!b) return null;
+
+      const maxDim = Math.max(b.size.x, b.size.y, b.size.z);
+      const height = b.size.y;
+
+      const target = {
+        x: b.center.x,
+        y: b.center.y - (height * cfg.targetYOffsetFactor),
+        z: b.center.z
+      };
+
+      const radius = Math.min(cfg.radiusMaxM, Math.max(cfg.radiusMinM, maxDim * cfg.radiusFactor));
+
+      return {
+        orbit: formatOrbit(cfg.defaultThetaDeg, cfg.defaultPhiDeg, radius),
+        target: formatTarget(target.x, target.y, target.z)
+      };
+    }
+
+    function applyCameraSnap(snap, jump) {
+      if (!snap) return;
+      try {
+        viewer.setAttribute("camera-orbit", snap.orbit);
+        viewer.setAttribute("camera-target", snap.target);
+        if (jump && typeof viewer.jumpCameraToGoal === "function") viewer.jumpCameraToGoal();
+      } catch (e) {}
+    }
+
+    return { computeAutoDefaultFromBounds, applyCameraSnap };
+  }
+
+  /* =========================
+     APP (per cfg-shell)
+  ========================= */
+
+  function initOne(root) {
+    if (root.dataset.cfgInit === "1") return;
+    root.dataset.cfgInit = "1";
+
+    const dom = {
+      viewer: root.querySelector("#viewer"),
+      loading: root.querySelector("#loading"),
+      firstDrop: root.querySelector("#firstDrop"),
+      totalDrop: root.querySelector("#totalDrop"),
+      seedInline: root.querySelector("#seedInline"),
+      collectionSelect: root.querySelector("#collectionSelect"),
+      pendantSelector: root.querySelector("#pendantSelector"),
+      activePendantEditor: root.querySelector("#activePendantEditor"),
+      canopySizeGroup: root.querySelector("#canopySizeGroup")
+    };
+
+    if (!dom.viewer || !dom.loading || !dom.firstDrop || !dom.totalDrop || !dom.collectionSelect || !dom.pendantSelector || !dom.activePendantEditor) return;
+
+    const canopyBtnS = dom.canopySizeGroup ? dom.canopySizeGroup.querySelector('button[data-canopysize="s"]') : null;
+    const canopyBtnM = dom.canopySizeGroup ? dom.canopySizeGroup.querySelector('button[data-canopysize="m"]') : null;
+
+    const state = {
+      count: 3,
+      layout: "ring",
+      canopyAppearance: 0,
+      canopySize: 0,
+      cable: 0,
+      randomSeed: 1,
+      collectionId: "organic",
+      allShade: 0,
+      activePendantIndex: 0,
+      pendants: []
+    };
+
+    let lastCount = state.count;
+    let autoDefaultSnap = null;
+    let interacting = false;
+    let snapTimer = null;
+
+    const cam = cameraHelpers(dom.viewer);
+
+    /* ---------- Rules + Constraints ---------- */
+
+    function canUseRandomLayout() {
+      return state.count >= SETTINGS.rules.layout.randomMinCount;
+    }
+
+    function isCanopySAllowed() {
+      return state.count <= SETTINGS.rules.canopySize.sAllowedMaxCount;
+    }
+
+    function isCanopyMAllowed() {
+      return state.count <= SETTINGS.rules.canopySize.mAllowedMaxCount;
+    }
+
+    function clampTotalDropUI() {
+      const cur = Number(dom.totalDrop.value);
+      const clamped = clamp(cur, 0, SETTINGS.totalDropMaxCm);
+      if (String(clamped) !== String(cur)) dom.totalDrop.value = String(clamped);
+    }
+
+    function defaultModelForIndex(i, colId) {
+      const col = getCollectionById(colId);
+      if (colId === "organic") return DEFAULT_MODEL_ORDER[i % DEFAULT_MODEL_ORDER.length];
+      const models = col.models || [];
+      return models.length ? models[i % models.length].id : 0;
+    }
+
+    function syncPendantsToCountAndCollection() {
+      const col = getCollectionById(state.collectionId);
+
+      while (state.pendants.length < state.count) {
+        const i = state.pendants.length;
+        state.pendants.push({ model: defaultModelForIndex(i, state.collectionId) });
+      }
+
+      state.pendants.length = state.count;
+      state.activePendantIndex = clamp(state.activePendantIndex, 0, state.count - 1);
+
+      for (let i = 0; i < state.pendants.length; i++) {
+        if (!modelIsInCollection(state.pendants[i].model, col)) {
+          state.pendants[i].model = defaultModelForIndex(i, state.collectionId);
+        }
+      }
+    }
+
+    function enforceConstraints() {
+      syncPendantsToCountAndCollection();
+      clampTotalDropUI();
+
+      if (!canUseRandomLayout() && state.layout === "random_ring") {
+        state.layout = "ring";
+        state.randomSeed = 0;
+      }
+
+      if (!isCanopySAllowed() && state.canopySize === 0) {
+        state.canopySize = isCanopyMAllowed() ? 1 : 2;
+      }
+
+      if (!isCanopyMAllowed() && state.canopySize === 1) {
+        state.canopySize = 2;
+      }
+    }
+
+    /* ---------- Render ---------- */
+
+    function setActiveInGroup(groupEl, value) {
+      if (!groupEl) return;
+      const btns = Array.from(groupEl.querySelectorAll("button"));
+      btns.forEach(b => b.classList.toggle("is-active", String(b.dataset.value) === String(value)));
+    }
+
+    function setActiveGroup(groupId, value) {
+      setActiveInGroup(root.querySelector(`[data-radio="${groupId}"]`), value);
+    }
+
+    function renderCollectionDropdown() {
+      dom.collectionSelect.innerHTML = "";
+      COLLECTIONS.forEach(col => {
+        const opt = document.createElement("option");
+        opt.value = col.id;
+        opt.textContent = col.label;
+        dom.collectionSelect.appendChild(opt);
+      });
+      dom.collectionSelect.value = state.collectionId;
+    }
+
+    function renderLayoutAvailability() {
+      const randomBtn = root.querySelector('button[data-action="setLayout"][data-value="random_ring"]');
+      if (randomBtn) randomBtn.classList.toggle("is-hidden", !canUseRandomLayout());
+    }
+
+    function renderSeedVisibility() {
+      const show = state.layout === "random_ring";
+      if (dom.seedInline) dom.seedInline.classList.toggle("is-hidden", !show);
+    }
+
+    function renderCanopyAvailability() {
+      if (canopyBtnS) canopyBtnS.classList.toggle("is-hidden", !isCanopySAllowed());
+      if (canopyBtnM) canopyBtnM.classList.toggle("is-hidden", !isCanopyMAllowed());
+    }
+
+    function renderPendantSelector() {
+      dom.pendantSelector.innerHTML = "";
+      for (let i = 0; i < state.count; i++) {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "pill small";
+        b.dataset.action = "setActivePendant";
+        b.dataset.value = String(i);
+        b.textContent = String(i + 1);
+        if (i === state.activePendantIndex) b.classList.add("is-active");
+        dom.pendantSelector.appendChild(b);
+      }
+    }
+
+    function renderActivePendantEditor() {
+      const i = state.activePendantIndex;
+      const p = state.pendants[i];
+      const col = getCollectionById(state.collectionId);
+
+      const modelPills = (col.models || []).map(m => {
+        const active = Number(m.id) === Number(p.model) ? "is-active" : "";
+        return `<button class="pill small ${active}" type="button" data-action="setModel" data-i="${i}" data-value="${m.id}">${m.label}</button>`;
+      }).join("");
+
+      dom.activePendantEditor.innerHTML = `
+        <div class="section" style="margin-bottom:0;">
+          <div class="section-title">Pendant ${i + 1}</div>
+          <div class="pills" data-radio="model-${i}">
+            ${modelPills}
+          </div>
+        </div>
+      `;
+    }
+
+    function renderAll() {
+      renderLayoutAvailability();
+      renderCanopyAvailability();
+      renderSeedVisibility();
+
+      setActiveGroup("count", state.count);
+      setActiveGroup("layout", state.layout);
+      setActiveGroup("canopy", state.canopyAppearance);
+      setActiveGroup("cable", state.cable);
+      setActiveGroup("canopySize", state.canopySize);
+      setActiveGroup("allShade", state.allShade);
+
+      renderPendantSelector();
+      renderActivePendantEditor();
+
+      dom.collectionSelect.value = state.collectionId;
+    }
+
+    /* ---------- Effects (URL + Model load) ---------- */
+
+    const scheduleUrlUpdate = debounce(() => {
+      const code = encodeStateToCode(state, dom);
+      setUrlCode(code);
+    }, SETTINGS.debounce.urlMs);
+
+    const scheduleModelLoad = debounce(() => {
+      loadModel();
+    }, SETTINGS.debounce.modelMs);
+
+    const scheduleSuspensionModelLoad = debounce(() => {
+      loadModel();
+    }, SETTINGS.debounce.suspensionMs);
+
+    async function loadModel() {
+      enforceConstraints();
+      renderAll();
+
+      dom.loading.classList.add("active");
+
+      try {
+        const code = encodeStateToCode(state, dom);
+        setUrlCode(code);
+
+        const res = await fetch(SETTINGS.apiBase + "/generate_from_code", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+
+        if (!res.ok) {
+          console.error("API error", await res.text().catch(() => ""));
+          return;
+        }
+
+        const data = await res.json();
+        const glbRes = await fetch(SETTINGS.apiBase + data.glb_url);
+
+        if (!glbRes.ok) {
+          console.error("GLB fetch failed", glbRes.status);
+          return;
+        }
+
+        const buf = await glbRes.arrayBuffer();
+        const blob = new Blob([buf], { type: "model/gltf-binary" });
+        const blobUrl = URL.createObjectURL(blob);
+
+        dom.viewer.addEventListener("load", () => {
+          const snap = cam.computeAutoDefaultFromBounds();
+          if (snap) {
+            autoDefaultSnap = snap;
+            cam.applyCameraSnap(autoDefaultSnap, true);
+          } else {
+            autoDefaultSnap = {
+              orbit: dom.viewer.getAttribute("camera-orbit") || "90deg 65deg 9.5m",
+              target: dom.viewer.getAttribute("camera-target") || "0m -1.6m 0m"
+            };
+          }
+          if (autoDefaultSnap) cam.applyCameraSnap(autoDefaultSnap, false);
+        }, { once: true });
+
+        dom.viewer.src = blobUrl;
+      } catch (e) {
+        console.error("[cfg] loadModel failed", e);
+      } finally {
+        dom.loading.classList.remove("active");
+      }
+    }
+
+    /* ---------- Camera snapback wiring (unchanged behavior) ---------- */
+
+    function scheduleSnapBack() {
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        if (!interacting && autoDefaultSnap) cam.applyCameraSnap(autoDefaultSnap, false);
+      }, SETTINGS.camera.snapDelayMs);
+    }
+
+    dom.viewer.addEventListener("pointerdown", () => { interacting = true; }, { passive: true });
+
+    window.addEventListener("pointerup", () => {
+      if (!interacting) return;
+      interacting = false;
+      scheduleSnapBack();
+    }, { passive: true });
+
+    dom.viewer.addEventListener("touchend", () => {
+      interacting = false;
+      scheduleSnapBack();
+    }, { passive: true });
+
+    dom.viewer.addEventListener("wheel", () => {
+      interacting = true;
+      clearTimeout(snapTimer);
+      snapTimer = setTimeout(() => {
+        interacting = false;
+        scheduleSnapBack();
+      }, SETTINGS.camera.wheelReleaseMs);
+    }, { passive: true });
+
+    /* ---------- Actions (state changes in one place) ---------- */
+
+    function setCount(nextCountRaw) {
+      const nextCount = clamp(nextCountRaw, 3, 10);
+      const prev = clamp(lastCount, 3, 10);
+      const delta = nextCount - prev;
+
+      if (delta !== 0) {
+        const curTotal = +dom.totalDrop.value || 0;
+        const nextTotal = Math.max(0, curTotal + (delta * SETTINGS.extraLenPerPendantCm));
+        dom.totalDrop.value = String(clamp(nextTotal, 0, SETTINGS.totalDropMaxCm));
+      }
+
+      lastCount = nextCount;
+      state.count = nextCount;
+      enforceConstraints();
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setLayout(nextLayout) {
+      if (nextLayout === "random_ring" && !canUseRandomLayout()) nextLayout = "ring";
+      state.layout = nextLayout;
+
+      if (state.layout !== "random_ring") state.randomSeed = 0;
+
+      enforceConstraints();
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setActivePendant(idxRaw) {
+      state.activePendantIndex = clamp(idxRaw, 0, state.count - 1);
+      renderPendantSelector();
+      renderActivePendantEditor();
+    }
+
+    function setCanopyAppearance(v) {
+      state.canopyAppearance = clamp(v, 0, 1);
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setCanopySize(v) {
+      const next = clamp(v, 0, 2);
+      if (next === 0 && !isCanopySAllowed()) return;
+      if (next === 1 && !isCanopyMAllowed()) return;
+
+      state.canopySize = next;
+      enforceConstraints();
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setCable(v) {
+      state.cable = clamp(v, 0, 1);
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setAllShade(v) {
+      state.allShade = clamp(v, 0, 2);
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setModel(iRaw, modelIdRaw) {
+      const i = Number(iRaw);
+      const modelId = Number(modelIdRaw);
+      if (!Number.isFinite(i) || !state.pendants[i]) return;
+
+      const col = getCollectionById(state.collectionId);
+      if (!modelIsInCollection(modelId, col)) return;
+
+      state.pendants[i].model = modelId;
+      renderActivePendantEditor();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function randomizeSeed() {
+      state.randomSeed = Math.floor(Math.random() * 1000000) + 1;
+      renderSeedVisibility();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function resetSeed() {
+      state.randomSeed = 0;
+      renderSeedVisibility();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    function setCollection(nextId) {
+      state.collectionId = getCollectionById(String(nextId || "organic")).id;
+
+      state.pendants = Array.from({ length: state.count }, (_, i) => ({
+        model: defaultModelForIndex(i, state.collectionId)
+      }));
+
+      state.activePendantIndex = clamp(state.activePendantIndex, 0, state.count - 1);
+
+      enforceConstraints();
+      renderAll();
+      scheduleUrlUpdate();
+      scheduleModelLoad();
+    }
+
+    /* ---------- Event wiring ---------- */
+
+    root.addEventListener("click", (e) => {
+      const btn = e.target && e.target.closest && e.target.closest("button[data-action]");
+      if (!btn) return;
+
+      const action = btn.dataset.action;
+
+      if (action === "setCount") return setCount(btn.dataset.value);
+      if (action === "setLayout") return setLayout(btn.dataset.value);
+      if (action === "setActivePendant") return setActivePendant(btn.dataset.value);
+      if (action === "setCanopy") return setCanopyAppearance(btn.dataset.value);
+      if (action === "setCanopySize") return setCanopySize(btn.dataset.value);
+      if (action === "setCable") return setCable(btn.dataset.value);
+      if (action === "setAllShade") return setAllShade(btn.dataset.value);
+      if (action === "setModel") return setModel(btn.dataset.i, btn.dataset.value);
+      if (action === "randomizeSeed") return randomizeSeed();
+      if (action === "resetSeed") return resetSeed();
+    });
+
+    dom.firstDrop.addEventListener("input", () => {
+      scheduleUrlUpdate();
+      scheduleSuspensionModelLoad();
+    });
+
+    dom.totalDrop.addEventListener("input", () => {
+      clampTotalDropUI();
+      scheduleUrlUpdate();
+      scheduleSuspensionModelLoad();
+    });
+
+    dom.collectionSelect.addEventListener("change", () => setCollection(dom.collectionSelect.value));
+
+    /* ---------- Init from URL ---------- */
+
+    function inferCollectionFromModels(models) {
+      for (const col of COLLECTIONS) {
+        const ok = models.every(mid => modelIsInCollection(mid, col));
+        if (ok) return col.id;
+      }
+      return "organic";
+    }
+
+    function applyDecoded(decoded) {
+      state.canopySize = clamp(decoded.canopySize, 0, 2);
+      state.canopyAppearance = clamp(decoded.canopyAppearance, 0, 1);
+      state.cable = clamp(decoded.cable, 0, 1);
+      state.layout = layoutIdToValue(decoded.layoutId);
+
+      state.randomSeed = Number.isFinite(+decoded.randomSeed) ? Math.max(0, Math.floor(+decoded.randomSeed)) : 0;
+      state.allShade = clamp(decoded.allShade, 0, 2);
+
+      dom.firstDrop.value = String(Math.max(0, decoded.firstCm || 0));
+      dom.totalDrop.value = String(clamp(Math.max(0, decoded.totalCm || 0), 0, SETTINGS.totalDropMaxCm));
+
+      const decodedCount = decoded.pendants.length ? decoded.pendants.length : decoded.count;
+      state.count = clamp(decodedCount, 3, 10);
+      lastCount = state.count;
+
+      const models = decoded.pendants.map(p => Number.isFinite(+p.model) ? Math.max(0, Math.floor(+p.model)) : 0);
+      state.collectionId = inferCollectionFromModels(models);
+
+      state.pendants = decoded.pendants.map(p => ({ model: Number.isFinite(+p.model) ? Math.max(0, Math.floor(+p.model)) : 0 }));
+
+      renderCollectionDropdown();
+      dom.collectionSelect.value = state.collectionId;
+
+      enforceConstraints();
+      renderAll();
+    }
+
+    renderCollectionDropdown();
+
+    const urlCode = getUrlCode();
+    const decoded = urlCode ? decodeCode(urlCode) : null;
+
+    if (decoded) {
+      applyDecoded(decoded);
+    } else {
+      enforceConstraints();
+      renderAll();
+      setUrlCode(encodeStateToCode(state, dom));
+    }
+
+    loadModel();
+  }
+
+  function initAll() {
+    document.querySelectorAll(".cfg-shell").forEach(initOne);
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initAll, { once: true });
+  } else {
+    initAll();
+  }
+})();
+</script>
